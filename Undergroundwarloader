@@ -8,7 +8,7 @@ local reach = 10
 
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/turtle"))()
 
-local Window = library:Window("KillAura")
+local Window = library:Window("Kyn Scripts")
 
 function findTool(String)
     local strl = String:lower()
