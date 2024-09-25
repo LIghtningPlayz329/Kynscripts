@@ -1,0 +1,123 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/LIghtningPlayz329/Kynscripts/refs/heads/main/Undergroundwarloader"))()
+
+-- UI Credits Script
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Function to create UI with Credits and a Button
+local function createCreditsUI()
+    -- Create ScreenGui
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "CreditsUI"
+    screenGui.Parent = playerGui
+
+    -- Main Frame for the credits UI
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0.5, 0, 0.3, 0)
+    frame.Position = UDim2.new(0.25, 0, 0.35, 0)
+    frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    frame.BackgroundTransparency = 0.5
+    frame.Parent = screenGui
+
+    -- Title Text
+    local title = Instance.new("TextLabel")
+    title.Text = "Credits"
+    title.Font = Enum.Font.SourceSansBold
+    title.TextSize = 40
+    title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    title.Size = UDim2.new(1, 0, 0.3, 0)
+    title.Position = UDim2.new(0, 0, 0, 0)
+    title.BackgroundTransparency = 1
+    title.Parent = frame
+
+    -- Credits Text
+    local credits = Instance.new("TextLabel")
+    credits.Text = "Script Made by Kyn Scripts on YouTube / https://discord.com/invite/KgChhHrn25 on Discord"
+    credits.Font = Enum.Font.SourceSans
+    credits.TextSize = 24
+    credits.TextColor3 = Color3.fromRGB(255, 255, 255)
+    credits.Size = UDim2.new(1, 0, 0.5, 0)
+    credits.Position = UDim2.new(0, 0, 0.3, 0)
+    credits.BackgroundTransparency = 1
+    credits.Parent = frame
+
+    -- Button to close the UI
+    local button = Instance.new("TextButton")
+    button.Text = "Nice!"
+    button.Font = Enum.Font.SourceSansBold
+    button.TextSize = 30
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    button.Size = UDim2.new(0.3, 0, 0.2, 0)
+    button.Position = UDim2.new(0.35, 0, 0.75, 0)
+    button.Parent = frame
+
+    -- When the button is clicked, remove the UI
+    button.MouseButton1Click:Connect(function()
+        screenGui:Destroy()  -- Remove the entire GUI
+    end)
+end
+
+-- Create the UI when the script runs
+createCreditsUI()
+
+local tpwalking = true
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local speaker = Players.LocalPlayer
+local hb = RunService.Heartbeat
+local speedMultiplier = 30  -- Increased speed
+
+-- Function to handle teleport-walking logic
+local function startTPWalk()
+    local chr = speaker.Character
+    local hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
+
+    -- Make sure character and humanoid exist before starting the loop
+    while tpwalking and chr and hum and hum.Parent do
+        local delta = hb:Wait()
+
+        -- Check if the player is moving
+        if hum.MoveDirection.Magnitude > 0 then
+            -- Apply teleport walking with the speed multiplier
+            chr:TranslateBy(hum.MoveDirection * delta * speedMultiplier)
+        end
+    end
+end
+
+-- Function to handle player death and respawn logic
+local function onHumanoidDied()
+    print("dead")  -- Print "dead" when the player dies
+
+    -- Wait for 5 seconds before restarting the teleport walk
+    wait(5)
+
+    -- Check if the character has respawned
+    if speaker.Character then
+        local newHumanoid = speaker.Character:FindFirstChildWhichIsA("Humanoid")
+        if newHumanoid then
+            startTPWalk()  -- Start TP walking again after respawn
+        end
+    end
+end
+
+-- Function to refresh TP Walk when the player respawns
+local function onCharacterAdded(character)
+    character:WaitForChild("HumanoidRootPart")
+    local humanoid = character:FindFirstChildWhichIsA("Humanoid")
+    
+    -- Listen for the death of the humanoid
+    humanoid.Died:Connect(onHumanoidDied)
+
+    -- Start TP walking for the new character
+    startTPWalk()
+end
+
+-- Listen for character respawns
+speaker.CharacterAdded:Connect(onCharacterAdded)
+
+-- Start TP walking for the first time (in case the player is already spawned)
+if speaker.Character then
+    onCharacterAdded(speaker.Character)
+end
